@@ -1,13 +1,14 @@
 ### This project contains benchmarking results of the libraries that can parse YAML **and** also support Serde.
 
-| Crate | Version | Merge Keys | Nested Enums | Notes |
-|------:|:---------|:-----------|:--------------|:-------|
-| [serde-saphyr](https://crates.io/crates/serde-saphyr) | 0.0.4 | ✅ Native | ✅ | No `unsafe`, no [unsafe-libyaml](https://crates.io/crates/unsafe-libyaml) |
-| [serde-yaml-bw](https://crates.io/crates/serde-yaml_bw) | 2.4.1 | ✅ Native | ✅ | Slow due Saphyr doing budget check first upfront of libyaml |
-| [serde-yaml-ng](https://crates.io/crates/serde-yaml-ng) | 0.10.0 | ⚠️ apply_merge | ❌ |  |
-| [serde-yaml](https://crates.io/crates/serde-yaml) | 0.9.34 + deprecated | ⚠️ apply_merge | ❌ | Original, deprecated, repo archived |
-| [serde-norway](https://crates.io/crates/serde-norway) | 0.9 | ⚠️ apply_merge | ❌ |  |
-| [serde-yml](https://crates.io/crates/serde-yml) | 0.0.12 | ⚠️ apply_merge | ❌ | Repo archived |
+| Crate | Version | Merge Keys | Nested Enums | Duplicate key rejection | Notes |
+|------:|:---------|:-----------|:--------------|:------------------------|:-------|
+| [serde-saphyr](https://crates.io/crates/serde-saphyr) | 0.0.4 | ✅ Native | ✅ | ✅ Configurable          | No `unsafe`, no [unsafe-libyaml](https://crates.io/crates/unsafe-libyaml) |
+| [serde-yaml-bw](https://crates.io/crates/serde-yaml_bw) | 2.4.1 | ✅ Native | ✅ | ✅ Configurable          | Slow due Saphyr doing budget check first upfront of libyaml |
+| [serde-yaml-ng](https://crates.io/crates/serde-yaml-ng) | 0.10.0 | ⚠️ apply_merge | ❌ | ❌                       |  |
+| [serde-yaml](https://crates.io/crates/serde-yaml) | 0.9.34 + deprecated | ⚠️ apply_merge | ❌ | ❌                       | Original, deprecated, repo archived |
+| [serde-norway](https://crates.io/crates/serde-norway) | 0.9 | ⚠️ apply_merge | ❌ | ❌                       |  |
+| [serde-yml](https://crates.io/crates/serde-yml) | 0.0.12 | ⚠️ apply_merge | ❌ | ❌                       | Repo archived |
+
 
 **Note**: "apply_merge" indicates that the crate does not resolve YAML merge keys (`<<:`) automatically during deserialization right into Rust structure. Instead, the parsed `serde_yaml::Value` (or equivalent) must be passed through `.apply_merge()` to merge inherited mappings before only then converting to a typed struct. So partial support.
 

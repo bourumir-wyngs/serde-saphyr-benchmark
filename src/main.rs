@@ -7,6 +7,8 @@
 //
 // Assumes serde_yml and serde_norway expose `Value` with `apply_merge()` like serde_yaml.
 
+mod duplicate_keys;
+
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
@@ -250,4 +252,8 @@ fn main() {
         let nested_str = if r.nested_enums { "✅" } else { "❌" };
         println!("| {} | {} | {} |", r.name, merge_str, nested_str);
     }
+
+    duplicate_keys::duplicate_keys_across_crates();
 }
+
+
