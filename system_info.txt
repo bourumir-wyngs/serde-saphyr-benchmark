@@ -1,0 +1,205 @@
+=== OS ===
+LSB Version:	core-11.1.0ubuntu4-noarch:printing-11.1.0ubuntu4-noarch:security-11.1.0ubuntu4-noarch
+Distributor ID:	Ubuntu
+Description:	Ubuntu 22.04.5 LTS
+Release:	22.04
+Codename:	jammy
+Linux Leo 5.15.0-156-generic #166-Ubuntu SMP Sat Aug 9 00:02:46 UTC 2025 x86_64 x86_64 x86_64 GNU/Linux
+
+=== CPU ===
+Architecture:                            x86_64
+CPU op-mode(s):                          32-bit, 64-bit
+Address sizes:                           39 bits physical, 48 bits virtual
+Byte Order:                              Little Endian
+CPU(s):                                  12
+On-line CPU(s) list:                     0-11
+Vendor ID:                               GenuineIntel
+Model name:                              Intel(R) Core(TM) i7-8700K CPU @ 3.70GHz
+CPU family:                              6
+Model:                                   158
+Thread(s) per core:                      2
+Core(s) per socket:                      6
+Socket(s):                               1
+Stepping:                                10
+CPU max MHz:                             5000.0000
+CPU min MHz:                             800.0000
+BogoMIPS:                                7399.70
+Flags:                                   fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pat pse36 clflush dts acpi mmx fxsr sse sse2 ss ht tm pbe syscall nx pdpe1gb rdtscp lm constant_tsc art arch_perfmon pebs bts rep_good nopl xtopology nonstop_tsc cpuid aperfmperf pni pclmulqdq dtes64 monitor ds_cpl smx est tm2 ssse3 sdbg fma cx16 xtpr pdcm pcid sse4_1 sse4_2 x2apic movbe popcnt tsc_deadline_timer aes xsave avx f16c rdrand lahf_lm abm 3dnowprefetch cpuid_fault epb invpcid_single pti ssbd ibrs ibpb stibp fsgsbase tsc_adjust bmi1 avx2 smep bmi2 erms invpcid mpx rdseed adx smap clflushopt intel_pt xsaveopt xsavec xgetbv1 xsaves dtherm ida arat pln pts hwp hwp_notify hwp_act_window hwp_epp md_clear flush_l1d arch_capabilities
+L1d cache:                               192 KiB (6 instances)
+L1i cache:                               192 KiB (6 instances)
+L2 cache:                                1.5 MiB (6 instances)
+L3 cache:                                12 MiB (1 instance)
+NUMA node(s):                            1
+NUMA node0 CPU(s):                       0-11
+Vulnerability Gather data sampling:      Mitigation; Microcode
+Vulnerability Indirect target selection: Not affected
+Vulnerability Itlb multihit:             KVM: Mitigation: VMX unsupported
+Vulnerability L1tf:                      Mitigation; PTE Inversion
+Vulnerability Mds:                       Mitigation; Clear CPU buffers; SMT vulnerable
+Vulnerability Meltdown:                  Mitigation; PTI
+Vulnerability Mmio stale data:           Mitigation; Clear CPU buffers; SMT vulnerable
+Vulnerability Reg file data sampling:    Not affected
+Vulnerability Retbleed:                  Mitigation; IBRS
+Vulnerability Spec rstack overflow:      Not affected
+Vulnerability Spec store bypass:         Mitigation; Speculative Store Bypass disabled via prctl and seccomp
+Vulnerability Spectre v1:                Mitigation; usercopy/swapgs barriers and __user pointer sanitization
+Vulnerability Spectre v2:                Mitigation; IBRS; IBPB conditional; STIBP conditional; RSB filling; PBRSB-eIBRS Not affected; BHI Not affected
+Vulnerability Srbds:                     Mitigation; Microcode
+Vulnerability Tsa:                       Not affected
+Vulnerability Tsx async abort:           Mitigation; TSX disabled
+
+=== MEMORY ===
+               total        used        free      shared  buff/cache   available
+Mem:            62Gi        10Gi        19Gi       1.0Gi        32Gi        50Gi
+Swap:             0B          0B          0B
+	Size: 32 GB
+	Speed: 3000 MT/s
+	Configured Memory Speed: 3000 MT/s
+	Size: No Module Installed
+	Speed: Unknown
+	Configured Memory Speed: Unknown
+	Size: 32 GB
+	Speed: 3000 MT/s
+	Configured Memory Speed: 3000 MT/s
+	Size: No Module Installed
+	Speed: Unknown
+	Configured Memory Speed: Unknown
+
+=== STORAGE ===
+NAME          SIZE TYPE MOUNTPOINT
+loop0       401.5M loop /snap/blender/6514
+loop1           4K loop /snap/bare/5
+loop2       401.5M loop /snap/blender/6559
+loop3         186M loop /snap/chromium/3248
+loop4         186M loop /snap/chromium/3251
+loop5         2.1G loop /snap/clion/377
+loop6         2.1G loop /snap/clion/385
+loop7       104.2M loop /snap/core/17212
+loop8       104.2M loop /snap/core/17247
+loop9        55.5M loop /snap/core18/2947
+loop10       55.5M loop /snap/core18/2952
+loop11       63.8M loop /snap/core20/2599
+loop12       63.8M loop /snap/core20/2669
+loop13       73.9M loop /snap/core22/2111
+loop14       73.9M loop /snap/core22/2133
+loop15       67.2M loop /snap/cups/1100
+loop16       47.6M loop /snap/cups/1112
+loop17      247.1M loop /snap/firefox/6836
+loop18      247.1M loop /snap/firefox/6933
+loop19      164.8M loop /snap/gnome-3-28-1804/194
+loop20      164.8M loop /snap/gnome-3-28-1804/198
+loop21      349.7M loop /snap/gnome-3-38-2004/140
+loop22      349.7M loop /snap/gnome-3-38-2004/143
+loop23        516M loop /snap/gnome-42-2204/202
+loop24      516.2M loop /snap/gnome-42-2204/226
+loop25       69.8M loop /snap/go/10927
+loop26       69.8M loop /snap/go/10938
+loop27       81.3M loop /snap/gtk-common-themes/1534
+loop28       91.7M loop /snap/gtk-common-themes/1535
+loop29      337.1M loop /snap/inkscape/10758
+loop30      338.8M loop /snap/inkscape/10823
+loop31        6.9M loop /snap/notepad-plus-plus/412
+loop32        7.9M loop /snap/pulsemixer/250
+loop33        7.9M loop /snap/pulsemixer/283
+loop34       49.3M loop /snap/snapd/24792
+loop35       50.8M loop /snap/snapd/25202
+loop36         16K loop /snap/software-boutique/54
+loop37         16K loop /snap/software-boutique/57
+loop38       13.5M loop /snap/ubuntu-mate-welcome/720
+loop39       13.5M loop /snap/ubuntu-mate-welcome/726
+loop40      460.6M loop /snap/wine-platform-9-devel-core22/33
+loop41        544M loop /snap/wine-platform-runtime-core22/100
+loop42      139.8M loop /snap/yakyak/117
+loop43       95.2M loop /snap/yakyak/58
+sda         931.5G disk 
+└─sda1      931.5G part /spare
+nvme2n1       1.9T disk /home
+nvme1n1       7.3T disk 
+├─nvme1n1p1   512M part /boot/efi
+└─nvme1n1p2   7.3T part /work
+nvme0n1     232.9G disk 
+├─nvme0n1p1   512M part 
+├─nvme0n1p2   9.3G part 
+├─nvme0n1p3  14.9G part 
+└─nvme0n1p4 208.2G part /home/audrius/.cargo
+Filesystem      Size  Used Avail Use% Mounted on
+/dev/nvme2n1    1.9T  1.2T  772G  60% /
+
+=== GPU ===
+01:00.0 VGA compatible controller: NVIDIA Corporation GP102 [GeForce GTX 1080 Ti] (rev a1)
+Sat Oct  4 13:29:28 2025       
++-----------------------------------------------------------------------------------------+
+| NVIDIA-SMI 560.35.05              Driver Version: 560.35.05      CUDA Version: 12.6     |
+|-----------------------------------------+------------------------+----------------------+
+| GPU  Name                 Persistence-M | Bus-Id          Disp.A | Volatile Uncorr. ECC |
+| Fan  Temp   Perf          Pwr:Usage/Cap |           Memory-Usage | GPU-Util  Compute M. |
+|                                         |                        |               MIG M. |
+|=========================================+========================+======================|
+|   0  NVIDIA GeForce GTX 1080 Ti     Off |   00000000:01:00.0  On |                  N/A |
+| 19%   55C    P0             68W /  250W |     756MiB /  11264MiB |      2%      Default |
+|                                         |                        |                  N/A |
++-----------------------------------------+------------------------+----------------------+
+                                                                                         
++-----------------------------------------------------------------------------------------+
+| Processes:                                                                              |
+|  GPU   GI   CI        PID   Type   Process name                              GPU Memory |
+|        ID   ID                                                               Usage      |
+|=========================================================================================|
+|    0   N/A  N/A      1888      G   /usr/lib/xorg/Xorg                            442MiB |
+|    0   N/A  N/A     31821      G   ...seed-version=20251002-180042.726000         11MiB |
+|    0   N/A  N/A    786753      G   /snap/clion/385/bin/clion                      73MiB |
+|    0   N/A  N/A    787048      G   ...erProcess --variations-seed-version        127MiB |
+|    0   N/A  N/A    798250      G   ...onEnabled --variations-seed-version         96MiB |
++-----------------------------------------------------------------------------------------+
+
+=== RUST TOOLCHAIN ===
+rustc 1.90.0 (1159e78c4 2025-09-14)
+cargo 1.90.0 (840b83a10 2025-07-30)
+
+=== DEPENDENCIES ===
+benchmark v0.1.0 (/home/audrius/benchmark)
+├── serde v1.0.228
+│   ├── serde_core v1.0.228
+│   └── serde_derive v1.0.228 (proc-macro)
+│       ├── proc-macro2 v1.0.101
+│       │   └── unicode-ident v1.0.19
+│       ├── quote v1.0.40
+│       │   └── proc-macro2 v1.0.101 (*)
+│       └── syn v2.0.106
+│           ├── proc-macro2 v1.0.101 (*)
+│           ├── quote v1.0.40 (*)
+│           └── unicode-ident v1.0.19
+├── serde-saphyr v0.0.4
+│   ├── num-traits v0.2.19
+│   │   [build-dependencies]
+│   │   └── autocfg v1.5.0
+│   ├── saphyr-parser v0.0.6
+│   │   ├── arraydeque v0.5.1
+│   │   └── hashlink v0.10.0
+│   │       └── hashbrown v0.15.5
+│   │           └── foldhash v0.1.5
+│   ├── serde v1.0.228 (*)
+│   ├── serde_json v1.0.145
+│   │   ├── itoa v1.0.15
+│   │   ├── memchr v2.7.6
+│   │   ├── ryu v1.0.20
+│   │   └── serde_core v1.0.228
+│   └── smallvec v2.0.0-alpha.11
+├── serde_norway v0.9.42
+│   ├── indexmap v2.11.4
+
+=== CPU GOVERNOR ===
+powersave
+
+=== LOAD / UPTIME ===
+ 13:29:28 up 21:30,  1 user,  load average: 0.96, 0.83, 0.63
+top - 13:29:28 up 21:30,  1 user,  load average: 0.96, 0.83, 0.63
+Tasks: 482 total,   1 running, 481 sleeping,   0 stopped,   0 zombie
+%Cpu(s):  0.9 us,  1.3 sy,  0.0 ni, 97.8 id,  0.0 wa,  0.0 hi,  0.0 si,  0.0 st
+MiB Mem :  64240.1 total,  20266.7 free,  10366.4 used,  33607.1 buff/cache
+MiB Swap:      0.0 total,      0.0 free,      0.0 used.  52111.5 avail Mem 
+
+    PID USER      PR  NI    VIRT    RES    SHR S  %CPU  %MEM     TIME+ COMMAND
+ 821500 audrius   20   0   15792   5372   4172 R  18.8   0.0   0:00.03 top
+    353 root     -51   0       0      0      0 S   6.2   0.0   5:38.16 irq/163-nvidia
+   1888 root      20   0   25.0g 383548 153180 S   6.2   0.6  30:01.17 Xorg
