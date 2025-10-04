@@ -1,13 +1,14 @@
 ### This project contains benchmarking results of the libraries that can parse YAML **and** also support Serde.
 
-| Crate                                                   | Version             | Notes                                                                     |
-| ------------------------------------------------------- |---------------------|--------------------------------------------------------------------------- |
-| [serde-saphyr](https://crates.io/crates/serde-saphyr)   | 0.0.4               | No `unsafe`, no [unsafe-libyaml](https://crates.io/crates/unsafe-libyaml)  |
-| [serde-yaml-ng](https://crates.io/crates/serde-yaml-ng) | 0.10.0              |                                                                           |
-| [serde-yaml](https://crates.io/crates/serde-yaml)       | 0.9.34 + deprecated | Original, deprecated, repo archived                                       |
-| [serde-norway](https://crates.io/crates/serde-norway)   | 0.9                 |                                                                           |
-| [serde-yml](https://crates.io/crates/serde-yml)         | 0.0.12              | Repo archived                                                             |
-| [serde-yaml_bw](https://crates.io/crates/serde-yaml_bw) | 2.4.1               | Slow due Saphyr doing budget check first upfront of libyaml               |
+| Crate | Version | Merge Keys | Nested Enums | Notes |
+|------:|:---------|:-----------|:--------------|:-------|
+| [serde-saphyr](https://crates.io/crates/serde-saphyr) | 0.0.4 | ✅ Native | ✅ | No `unsafe`, no [unsafe-libyaml](https://crates.io/crates/unsafe-libyaml) |
+| [serde-yaml-bw](https://crates.io/crates/serde-yaml_bw) | 2.4.1 | ✅ Native | ✅ | Slow due Saphyr doing budget check first upfront of libyaml |
+| [serde-yaml-ng](https://crates.io/crates/serde-yaml-ng) | 0.10.0 | ⚠️ apply_merge | ❌ |  |
+| [serde-yaml](https://crates.io/crates/serde-yaml) | 0.9.34 + deprecated | ⚠️ apply_merge | ❌ | Original, deprecated, repo archived |
+| [serde-norway](https://crates.io/crates/serde-norway) | 0.9 | ⚠️ apply_merge | ❌ |  |
+| [serde-yml](https://crates.io/crates/serde-yml) | 0.0.12 | ⚠️ apply_merge | ❌ | Repo archived |
+
 
 ### System Configuration (Benchmark Environment)
 Benchmarking of five libraries was done using code that can be found in benchmark/benches of this project, on the following hardware:
