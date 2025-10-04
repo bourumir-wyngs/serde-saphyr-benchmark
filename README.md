@@ -9,6 +9,7 @@
 | [serde-norway](https://crates.io/crates/serde-norway) | 0.9 | ⚠️ apply_merge | ❌ |  |
 | [serde-yml](https://crates.io/crates/serde-yml) | 0.0.12 | ⚠️ apply_merge | ❌ | Repo archived |
 
+**Note**: "apply_merge" indicates that the crate does not resolve YAML merge keys (`<<:`) automatically during deserialization right into Rust structure. Instead, the parsed `serde_yaml::Value` (or equivalent) must be passed through `.apply_merge()` to merge inherited mappings before only then converting to a typed struct. So partial support.
 
 ### System Configuration (Benchmark Environment)
 Benchmarking of five libraries was done using code that can be found in benchmark/benches of this project, on the following hardware:
