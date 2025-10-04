@@ -1,17 +1,6 @@
 #!/usr/bin/env python3
 """
 Criterion -> publication-ready plots/tables
-(with outside legends, error bars on ALL line charts, and rotated labels)
-
-Changes in this revision:
-  - All line charts use error bars ("statistical dashes") with a '.' marker:
-      * median_vs_size.png      (formerly "central_vs_size")
-      * relative_vs_baseline.png
-      * throughput_vs_size.png  (for consistency)
-  - Relative-vs-baseline now draws bootstrap CIs by default; disable with --no-relative-ci.
-  - Legends outside the plotting area and 90° boxplot labels preserved.
-
-Author: <you>
 """
 from __future__ import annotations
 
