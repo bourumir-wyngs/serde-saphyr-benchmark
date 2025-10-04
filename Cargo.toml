@@ -1,0 +1,28 @@
+[package]
+name = "benchmark"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+serde = { version = "1", features = ["derive"] }
+
+# --- YAML parser candidates (pick the ones you actually use) ---
+# Replace versions with what you have. If your forks expose from_str under a different path,
+# keep the bench code and only adjust the specific "use" lines there.
+serde_yaml = "0.9.34+deprecated"
+serde-yaml-bw = { package = "serde_yaml_bw", version = "2.4.1", optional = false }
+serde-norway = { package = "serde_norway", version = "0.9", optional = false }
+serde-yml = { package = "serde_yml", version = "0.0.12", optional = false }
+serde-saphyr = "0.0.4"
+mimalloc = { version = "0.1", optional = true }
+
+[dev-dependencies]
+criterion = "0.7.0"
+
+[features]
+# Enable if you want to fix the allocator for more stable results
+mimalloc = ["dep:mimalloc"]
+
+[[bench]]
+name = "compare_yaml"
+harness = false
