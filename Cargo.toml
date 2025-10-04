@@ -10,6 +10,7 @@ serde = { version = "1", features = ["derive"] }
 # Replace versions with what you have. If your forks expose from_str under a different path,
 # keep the bench code and only adjust the specific "use" lines there.
 serde_yaml = "0.9.34+deprecated"
+serde_yaml_ng = "0.10.0"
 serde-yaml-bw = { package = "serde_yaml_bw", version = "2.4.1", optional = false }
 serde-norway = { package = "serde_norway", version = "0.9", optional = false }
 serde-yml = { package = "serde_yml", version = "0.0.12", optional = false }

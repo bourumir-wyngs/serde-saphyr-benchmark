@@ -105,6 +105,15 @@ fn parse_serde_yaml(yaml: &str) -> Document {
 }
 
 #[allow(dead_code)]
+fn parse_serde_yaml_ng(yaml: &str) -> Document {
+    // Baseline serde_yaml
+    use serde_yaml_ng as SY;
+    let doc: Document = SY::from_str(black_box(yaml)).expect("serde_yaml_ng parse failed");
+    black_box(doc)
+}
+
+
+#[allow(dead_code)]
 fn parse_serde_yaml_bw(yaml: &str) -> Document {
     // Fork: serde-yaml-bw (assumed crate name serde_yaml_bw)
     use serde_yaml_bw as SYBW;
