@@ -206,6 +206,13 @@ fn bench_compare_yaml(c: &mut Criterion) {
             |b, y| b.iter(|| { let doc = parse_serde_yaml(y); black_box(doc.items.len()); }),
         );
 
+        // ---- serde_yaml (baseline) ----
+        group.bench_with_input(
+            BenchmarkId::new("serde_yaml_ng", format!("{}MiB", mib)),
+            &yaml,
+            |b, y| b.iter(|| { let doc = parse_serde_yaml_ng(y); black_box(doc.items.len()); }),
+        );
+
         // ---- serde_yaml_bw (if you use it) ----
         // Comment out if not in Cargo.toml
         group.bench_with_input(
