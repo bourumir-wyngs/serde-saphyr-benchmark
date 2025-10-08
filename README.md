@@ -29,21 +29,21 @@ Benchmarking of five libraries was done using code that can be found in benchmar
 
 ### Results
 <p align="center">
-<img src="https://github.com/bourumir-wyngs/serde-saphyr-benchmark/blob/master/figures/relative_vs_baseline.png?raw=true"
+<img src="https://github.com/bourumir-wyngs/serde-saphyr-benchmark/blob/master/figures/yaml_parse/relative_vs_baseline.png?raw=true"
 alt="Relative median time vs baseline"
 width="60%">
 </p>
 
 <p align="center">
-  <img src="https://github.com/bourumir-wyngs/serde-saphyr-benchmark/blob/master/figures/central_vs_size.png?raw=true" 
+  <img src="https://github.com/bourumir-wyngs/serde-saphyr-benchmark/blob/master/figures/yaml_parse/central_vs_size.png?raw=true" 
        alt="Central vs size" 
        width="60%">
 </p>
 
 <p align="center">
-  <img src="https://github.com/bourumir-wyngs/serde-saphyr-benchmark/blob/master/figures/throughput_vs_size.png?raw=true" 
+  <img src="https://github.com/bourumir-wyngs/serde-saphyr-benchmark/blob/master/figures/yaml_parse/throughput_vs_size.png?raw=true" 
        alt="Throughput vs size" 
        width="60%">
 </p>
 
-Data were processed with the script [plot_criterion.py](./plot_criterion.py) located in the root folder of this project. Raw benchmark data as produced by Criterion are available in the archive [criterion.zip](./criterion.zip).
+Data were processed with the script [plot_criterion.py](./plot_criterion.py) located in the root folder of this project. 
