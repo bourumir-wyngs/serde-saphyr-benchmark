@@ -35,12 +35,6 @@ width="60%">
 </p>
 
 <p align="center">
-  <img src="https://github.com/bourumir-wyngs/serde-saphyr-benchmark/blob/master/figures/yaml_parse/central_vs_size.png?raw=true" 
-       alt="Central vs size" 
-       width="60%">
-</p>
-
-<p align="center">
   <img src="https://github.com/bourumir-wyngs/serde-saphyr-benchmark/blob/master/figures/yaml_parse/throughput_vs_size.png?raw=true" 
        alt="Throughput vs size" 
        width="60%">
