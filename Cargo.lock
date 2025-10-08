@@ -55,6 +55,7 @@ dependencies = [
  "mimalloc",
  "serde",
  "serde-saphyr",
+ "serde_json",
  "serde_norway",
  "serde_yaml",
  "serde_yaml_bw",

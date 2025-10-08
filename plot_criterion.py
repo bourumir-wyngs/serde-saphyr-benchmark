@@ -23,60 +23,36 @@ import matplotlib.pyplot as plt
 # --------------------------- Discovery ------------------------------------- #
 
 def _discover_groups(root_path: Path) -> List[str]:
-    """Find available Criterion 'group' names under criterion/<group>/..."""
+    """Find available Criterion 'group' names under criterion/<group>/... (filesystem only)."""
     groups = set()
-    if root_path.is_file() and root_path.suffix == ".zip":
-        import zipfile
-        with zipfile.ZipFile(root_path) as z:
-            for n in z.namelist():
-                if not (n.startswith("criterion/") and n.count("/") >= 2):
-                    continue
-                parts = n.strip("/").split("/")
-                if len(parts) >= 2 and parts[0] == "criterion":
-                    groups.add(parts[1])
-    else:
-        for dirpath, dirs, files in os.walk(root_path):
-            if "criterion" in Path(dirpath).parts:
-                parts = Path(dirpath).parts
-                try:
-                    idx = parts.index("criterion")
-                except ValueError:
-                    continue
-                if idx + 1 < len(parts):
-                    groups.add(parts[idx+1])
+    for dirpath, dirs, files in os.walk(root_path):
+        if "criterion" in Path(dirpath).parts:
+            parts = Path(dirpath).parts
+            try:
+                idx = parts.index("criterion")
+            except ValueError:
+                continue
+            if idx + 1 < len(parts):
+                groups.add(parts[idx+1])
     return sorted(groups)
 
 
 def _discover_sizes(root_path: Path, group_filter: Optional[str]) -> List[str]:
-    """Infer available dataset sizes by scanning for 'sample.json'."""
+    """Infer available dataset sizes by scanning for 'sample.json' (filesystem only)."""
     sizes=set()
-    if root_path.is_file() and root_path.suffix == ".zip":
-        import zipfile
-        with zipfile.ZipFile(root_path) as z:
-            for n in z.namelist():
-                if not (n.endswith("sample.json") and n.startswith("criterion/")):
-                    continue
-                parts = n.strip("/").split("/")
-                if len(parts) < 6:
-                    continue
-                _, group, _lib, size, _nb, _file = parts[:6]
-                if group_filter and group != group_filter:
-                    continue
-                sizes.add(size)
-    else:
-        for dirpath, _dirs, files in os.walk(root_path):
-            if "sample.json" in files and "criterion" in Path(dirpath).parts:
-                parts = Path(dirpath).parts
-                try:
-                    idx = parts.index("criterion")
-                except ValueError:
-                    continue
-                if idx + 4 >= len(parts):
-                    continue
-                group, _lib, size, _nb = parts[idx+1:idx+5]
-                if group_filter and group != group_filter:
-                    continue
-                sizes.add(size)
+    for dirpath, _dirs, files in os.walk(root_path):
+        if "sample.json" in files and "criterion" in Path(dirpath).parts:
+            parts = Path(dirpath).parts
+            try:
+                idx = parts.index("criterion")
+            except ValueError:
+                continue
+            if idx + 4 >= len(parts):
+                continue
+            group, _lib, size, _nb = parts[idx+1:idx+5]
+            if group_filter and group != group_filter:
+                continue
+            sizes.add(size)
     def size_key(s: str) -> float:
         m = re.findall(r"[0-9.]+", s)
         return float(m[0]) if m else math.inf
@@ -85,103 +61,59 @@ def _discover_sizes(root_path: Path, group_filter: Optional[str]) -> List[str]:
 
 def _find_sample_files(root_path: Path, group_filter: Optional[str], size_filter: str) -> List[Tuple[str,str,str,io.TextIOBase]]:
     """
-    Locate the preferred 'sample.json' per (group, library, size).
+    Locate the preferred 'sample.json' per (group, library, size) on filesystem.
     Prefers 'new/sample.json' when both 'new' and 'base' exist.
     """
     results: List[Tuple[str,str,str,io.TextIOBase]] = []
-    if root_path.is_file() and root_path.suffix == ".zip":
-        import zipfile
-        z = zipfile.ZipFile(root_path)
-        candidates = [n for n in z.namelist() if n.endswith("sample.json") and n.startswith("criterion/")]
-        chosen: Dict[Tuple[str,str,str], Tuple[str,str]] = {}
-        for n in candidates:
-            parts = n.strip("/").split("/")
-            if len(parts) < 6:
-                continue
-            _, group, lib, size, nb, _file = parts[:6]
-            if group_filter and group != group_filter:
-                continue
-            if size != size_filter:
-                continue
-            key = (group, lib, size)
-            if key not in chosen or (chosen[key][0] != "new" and nb == "new"):
-                chosen[key] = (nb, n)
-        for (group, lib, size), (_nb, name) in chosen.items():
-            fobj = io.TextIOWrapper(io.BytesIO(z.read(name)), encoding="utf-8")
-            results.append((group, lib, size, fobj))
-        return results
-    else:
-        pool: Dict[Tuple[str,str,str], Path] = {}
-        for dirpath, _dirs, files in os.walk(root_path):
-            if "sample.json" not in files:
-                continue
-            parts = Path(dirpath).parts
-            try:
-                idx = parts.index("criterion")
-            except ValueError:
-                continue
-            if idx + 4 >= len(parts):
-                continue
-            group, lib, size, nb = parts[idx+1: idx+5]
-            if group_filter and group != group_filter:
-                continue
-            if size != size_filter:
-                continue
-            key = (group, lib, size)
-            if key not in pool or (pool[key].parts[-2] != "new" and nb == "new"):
-                pool[key] = Path(dirpath) / "sample.json"
-        for (group, lib, size), path in pool.items():
-            results.append((group, lib, size, open(path, "r", encoding="utf-8")))
-        return results
+    pool: Dict[Tuple[str,str,str], Path] = {}
+    for dirpath, _dirs, files in os.walk(root_path):
+        if "sample.json" not in files:
+            continue
+        parts = Path(dirpath).parts
+        try:
+            idx = parts.index("criterion")
+        except ValueError:
+            continue
+        if idx + 4 >= len(parts):
+            continue
+        group, lib, size, nb = parts[idx+1: idx+5]
+        if group_filter and group != group_filter:
+            continue
+        if size != size_filter:
+            continue
+        key = (group, lib, size)
+        if key not in pool or (pool[key].parts[-2] != "new" and nb == "new"):
+            pool[key] = Path(dirpath) / "sample.json"
+    for (group, lib, size), path in pool.items():
+        results.append((group, lib, size, open(path, "r", encoding="utf-8")))
+    return results
 
 
 def _find_estimate_files(root_path: Path, group_filter: Optional[str], size_filter: str) -> List[Tuple[str,str,str,io.TextIOBase]]:
-    """Locate 'estimates.json' per (group, library, size), preferring 'new/'."""
+    """Locate 'estimates.json' per (group, library, size) on filesystem, preferring 'new/'."""
     results: List[Tuple[str,str,str,io.TextIOBase]] = []
-    if root_path.is_file() and root_path.suffix == ".zip":
-        import zipfile
-        z = zipfile.ZipFile(root_path)
-        candidates = [n for n in z.namelist() if n.endswith("estimates.json") and n.startswith("criterion/")]
-        chosen: Dict[Tuple[str,str,str], Tuple[str,str]] = {}
-        for n in candidates:
-            parts = n.strip("/").split("/")
-            if len(parts) < 6:
-                continue
-            _, group, lib, size, nb, _file = parts[:6]
-            if group_filter and group != group_filter:
-                continue
-            if size != size_filter:
-                continue
-            key = (group, lib, size)
-            if key not in chosen or (chosen[key][0] != "new" and nb == "new"):
-                chosen[key] = (nb, n)
-        for (group, lib, size), (_nb, name) in chosen.items():
-            fobj = io.TextIOWrapper(io.BytesIO(z.read(name)), encoding="utf-8")
-            results.append((group, lib, size, fobj))
-        return results
-    else:
-        pool: Dict[Tuple[str,str,str], Path] = {}
-        for dirpath, _dirs, files in os.walk(root_path):
-            if "estimates.json" not in files:
-                continue
-            parts = Path(dirpath).parts
-            try:
-                idx = parts.index("criterion")
-            except ValueError:
-                continue
-            if idx + 4 >= len(parts):
-                continue
-            group, lib, size, nb = parts[idx+1: idx+5]
-            if group_filter and group != group_filter:
-                continue
-            if size != size_filter:
-                continue
-            key = (group, lib, size)
-            if key not in pool or (pool[key].parts[-2] != "new" and nb == "new"):
-                pool[key] = Path(dirpath) / "estimates.json"
-        for (group, lib, size), path in pool.items():
-            results.append((group, lib, size, open(path, "r", encoding="utf-8")))
-        return results
+    pool: Dict[Tuple[str,str,str], Path] = {}
+    for dirpath, _dirs, files in os.walk(root_path):
+        if "estimates.json" not in files:
+            continue
+        parts = Path(dirpath).parts
+        try:
+            idx = parts.index("criterion")
+        except ValueError:
+            continue
+        if idx + 4 >= len(parts):
+            continue
+        group, lib, size, nb = parts[idx+1: idx+5]
+        if group_filter and group != group_filter:
+            continue
+        if size != size_filter:
+            continue
+        key = (group, lib, size)
+        if key not in pool or (pool[key].parts[-2] != "new" and nb == "new"):
+            pool[key] = Path(dirpath) / "estimates.json"
+    for (group, lib, size), path in pool.items():
+        results.append((group, lib, size, open(path, "r", encoding="utf-8")))
+    return results
 
 
 # --------------------------- Loading --------------------------------------- #
@@ -199,6 +131,7 @@ def _pretty_label(lib: str) -> str:
         suf  = m.group(2).replace("_","-")
         return f"{base} (budget={suf})"
     x = lib.replace("_","-")
+    x = x.replace("serde-yaml-ng", "serde-yaml (ng)")
     x = x.replace("serde-yaml-bw", "serde-yaml (bw)")
     x = x.replace("serde-yaml-norway", "serde-yaml (norway)")
     return x
@@ -733,7 +666,7 @@ def main(argv: Optional[Sequence[str]] = None) -> None:
         Writes figures/tables to disk.
     """
     p = argparse.ArgumentParser(description="Make boxplots and summary tables from Criterion output.")
-    p.add_argument("path", help="Path to Criterion results directory OR .zip archive.")
+    p.add_argument("path", help="Path to Criterion results directory (e.g., ./target or ./target/criterion). Zip archives are not supported.")
     p.add_argument("--group", default=None, help="Criterion group to include (e.g. 'yaml_parse'). If omitted and only one group exists, it is used.")
     p.add_argument("--sizes", nargs="*", default=None, help="Dataset sizes to include (e.g. 1MiB 5MiB 10MiB). Default: all.")
     p.add_argument("--outdir", default="figures", help="Directory to write figures/tables. Default: ./figures")
@@ -760,6 +693,11 @@ def main(argv: Optional[Sequence[str]] = None) -> None:
 
     args = p.parse_args(argv)
 
+    # Disallow file inputs (e.g., .zip); require a directory
+    in_path = Path(args.path)
+    if in_path.is_file():
+        raise SystemExit("Input must be a directory containing 'criterion/...'. Zip files are not supported. Use e.g. './target' or './target/criterion'.")
+
     # Load data
     df = load_samples(args.path, args.group, args.sizes)
 
@@ -769,7 +707,9 @@ def main(argv: Optional[Sequence[str]] = None) -> None:
         est_df = load_estimates(args.path, args.group, args.sizes)
 
     # 1) Boxplots (rotate labels 90° by default)
-    box_dir = Path(args.outdir) / "boxplots"
+    group_name = str(df["group"].iloc[0])
+    out_root = Path(args.outdir) / group_name
+    box_dir = out_root / "boxplots"
     box_paths = save_boxplots(
         df,
         str(box_dir),
@@ -779,7 +719,7 @@ def main(argv: Optional[Sequence[str]] = None) -> None:
 
     # 2) Median vs size (error bars + '.' marker)
     if not args.no_median_line:
-        median_line_path = Path(args.outdir) / "median_vs_size.png"
+        median_line_path = out_root / "median_vs_size.png"
         save_median_vs_size_lineplot(
             df,
             str(median_line_path),
@@ -795,7 +735,7 @@ def main(argv: Optional[Sequence[str]] = None) -> None:
 
     # 3) Relative vs baseline (bootstrap CIs ON by default + '.' marker)
     if not args.no_relative:
-        rel_path = Path(args.outdir) / "relative_vs_baseline.png"
+        rel_path = out_root / "relative_vs_baseline.png"
         save_relative_vs_baseline(
             df,
             str(rel_path),
@@ -810,7 +750,7 @@ def main(argv: Optional[Sequence[str]] = None) -> None:
         rel_path = None
 
     # 3.5) Throughput vs size (with error bars + '.' marker)
-    thr_path = Path(args.outdir) / "throughput_vs_size.png"
+    thr_path = out_root / "throughput_vs_size.png"
     save_throughput_vs_size_lineplot(
         df,
         str(thr_path),
@@ -822,7 +762,7 @@ def main(argv: Optional[Sequence[str]] = None) -> None:
 
     # 4) Tables
     summary = build_summary_table(df)
-    csv_path, md_path = write_tables(summary, args.outdir)
+    csv_path, md_path = write_tables(summary, str(out_root))
 
     # Console output summary
     print("Wrote:")
