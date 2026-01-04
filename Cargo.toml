@@ -29,6 +29,6 @@ mimalloc = ["dep:mimalloc"]
 name = "compare_yaml"
 harness = false
 
-[[bench]]
-name = "compare_json"
-harness = false
+#[[bench]]
+#name = "compare_json"
+#harness = false
