@@ -145,7 +145,7 @@ fn main() {
         // Value + apply_merge
         let via = (|| {
             let mut v: serde_yaml::Value = serde_yaml::from_str(MERGE_KEYS_YAML).ok()?;
-            v.apply_merge();
+            v.apply_merge().ok();
             People::deserialize(v).ok()
         })()
             .map(|x| x == expected_people)
@@ -169,7 +169,7 @@ fn main() {
         } else {
             let via = (|| {
                 let mut v: serde_yaml_ng::Value = serde_yaml_ng::from_str(MERGE_KEYS_YAML).ok()?;
-                v.apply_merge();
+                v.apply_merge().ok();
                 People::deserialize(v).ok()
             })()
                 .map(|x| x == expected_people)
@@ -196,7 +196,7 @@ fn main() {
         } else {
             let via = (|| {
                 let mut v: serde_yml::Value = serde_yml::from_str(MERGE_KEYS_YAML).ok()?;
-                v.apply_merge();
+                v.apply_merge().ok();
                 People::deserialize(v).ok()
             })()
                 .map(|x| x == expected_people)
@@ -220,7 +220,7 @@ fn main() {
         } else {
             let via = (|| {
                 let mut v: serde_norway::Value = serde_norway::from_str(MERGE_KEYS_YAML).ok()?;
-                v.apply_merge();
+                v.apply_merge().ok();
                 People::deserialize(v).ok()
             })()
                 .map(|x| x == expected_people)

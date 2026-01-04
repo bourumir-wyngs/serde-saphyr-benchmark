@@ -139,7 +139,7 @@ fn parse_serde_yml(yaml: &str) -> Document {
 
 #[allow(dead_code)]
 fn parse_saphyr_budget_none(yaml: &str) -> Document {
-    use serde_saphyr::{sf_serde::Error, Options};
+    use serde_saphyr::{Error, Options};
     // Budget off: pure parser cost without guard bookkeeping (faster, but YAML must be own and controlled)
     let opts = Options { budget: None, ..Options::default() };
     let doc: Result<Document, Error> = serde_saphyr::from_str_with_options(black_box(yaml), opts);
@@ -149,13 +149,14 @@ fn parse_saphyr_budget_none(yaml: &str) -> Document {
 
 #[allow(dead_code)]
 fn parse_saphyr_budget_max(yaml: &str) -> Document {
-    use serde_saphyr::{budget::Budget, sf_serde::Error, Options};
+    use serde_saphyr::{budget::Budget, Error, Options};
 
     // Default budget would trigger DOS protection. This has no much impact on actual
     // performance because we only define threshold values we compare against.
     let many: usize = usize::MAX / 4;
     let opts = Options {
         budget: Some(Budget {
+            max_reader_input_bytes: Some(many),
             max_events: many,
             max_aliases: many,
             max_anchors: many,

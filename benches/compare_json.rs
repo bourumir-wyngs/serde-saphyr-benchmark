@@ -140,7 +140,7 @@ fn parse_serde_yml(json: &str) -> Document {
 
 #[allow(dead_code)]
 fn parse_saphyr_budget_none(json: &str) -> Document {
-    use serde_saphyr::{sf_serde::Error, Options};
+    use serde_saphyr::{Error, Options};
     let opts = Options { budget: None, ..Options::default() };
     let doc: Result<Document, Error> = serde_saphyr::from_str_with_options(black_box(json), opts);
     let doc = doc.expect("serde_saphyr (budget=None) parse failed");
@@ -149,10 +149,11 @@ fn parse_saphyr_budget_none(json: &str) -> Document {
 
 #[allow(dead_code)]
 fn parse_saphyr_budget_max(json: &str) -> Document {
-    use serde_saphyr::{budget::Budget, sf_serde::Error, Options};
+    use serde_saphyr::{budget::Budget, Error, Options};
     let many: usize = usize::MAX / 4;
     let opts = Options {
         budget: Some(Budget {
+            max_reader_input_bytes: Some(many),
             max_events: many,
             max_aliases: many,
             max_anchors: many,
