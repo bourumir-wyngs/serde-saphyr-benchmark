@@ -10,6 +10,7 @@
 mod duplicate_keys;
 
 use serde::{Deserialize, Serialize};
+use serde_json::Value;
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 struct Person {
@@ -68,6 +69,12 @@ status:
   Ok:
     payload:
       Full: Thorough
+"#;
+
+const ERROR_YAML: &str = r#"
+status:
+  E: rror:
+    code: 404
 "#;
 
 #[derive(Copy, Clone)]
@@ -239,6 +246,60 @@ fn main() {
             &expected_doc,
         ),
     });
+
+    // yaml-spanned (two-step process: parse to Value, then deserialize)
+    let merge_yaml_spanned = if works_direct(
+        || {
+            let value = yaml_spanned::from_str(MERGE_KEYS_YAML).ok()?;
+            yaml_spanned::from_value(&value.inner).ok()
+        },
+        &expected_people,
+    ) {
+        MergeSupport::Native
+    } else {
+        MergeSupport::No
+    };
+    rows.push(Row {
+        name: "yaml-spanned",
+        merge: merge_yaml_spanned,
+        nested_enums: works_direct(
+            || {
+                let value = yaml_spanned::from_str(NESTED_ENUMS_YAML).ok()?;
+                yaml_spanned::from_value(&value.inner).ok()
+            },
+            &expected_doc,
+        ),
+    });
+
+    println!("Error");
+    println!(
+        "serde-saphyr: {e}",
+        e = serde_saphyr::from_str::<Value>(ERROR_YAML).unwrap_err()
+    );
+    println!(
+        "serde-yaml-bw: {e}",
+        e = serde_yaml_bw::from_str::<Value>(ERROR_YAML).unwrap_err()
+    );
+    println!(
+        "serde_yaml: {e}",
+        e = serde_yaml::from_str::<Value>(ERROR_YAML).unwrap_err()
+    );
+    println!(
+        "serde_yaml_ng: {e}",
+        e = serde_yaml_ng::from_str::<Value>(ERROR_YAML).unwrap_err()
+    );
+    println!(
+        "serde_yml: {e}",
+        e = serde_yml::from_str::<Value>(ERROR_YAML).unwrap_err()
+    );
+    println!(
+        "serde_norway: {e}",
+        e = serde_norway::from_str::<Value>(ERROR_YAML).unwrap_err()
+    );
+    println!(
+        "yaml_spanned: {e}",
+        e = yaml_spanned::from_str(ERROR_YAML).unwrap_err()
+    );
 
     // Print Markdown table
     println!("| Crate | Merge Keys | Nested Enums |");

@@ -176,6 +176,15 @@ fn parse_saphyr_budget_max(yaml: &str) -> Document {
     black_box(doc)
 }
 
+#[allow(dead_code)]
+fn parse_yaml_spanned(yaml: &str) -> Document {
+    use yaml_spanned;
+    // yaml-spanned uses a two-step process: parse to Value, then deserialize
+    let value = yaml_spanned::from_str(black_box(yaml)).expect("yaml_spanned parse failed");
+    let doc: Document = yaml_spanned::from_value(&value.inner).expect("yaml_spanned deserialize failed");
+    black_box(doc)
+}
+
 // --------------------- Criterion bench ---------------------
 
 /// Register all comparisons in a single Criterion group.
@@ -248,6 +257,13 @@ fn bench_compare_yaml(c: &mut Criterion) {
             BenchmarkId::new("serde_saphyr/budget_max", format!("{}MiB", mib)),
             &yaml,
             |b, y| b.iter(|| { let doc = parse_saphyr_budget_max(y); black_box(doc.items.len()); }),
+        );
+
+        // ---- yaml-spanned ----
+        group.bench_with_input(
+            BenchmarkId::new("yaml_spanned", format!("{}MiB", mib)),
+            &yaml,
+            |b, y| b.iter(|| { let doc = parse_yaml_spanned(y); black_box(doc.items.len()); }),
         );
     }
 

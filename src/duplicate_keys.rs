@@ -67,6 +67,20 @@ pub fn duplicate_keys_across_crates() {
         }
     };
 
+    // yaml-spanned (two-step process: parse to Value, then deserialize)
+    let yaml_spanned_direct_rejects = {
+        match yaml_spanned::from_str(DUP_YAML) {
+            Ok(v) => yaml_spanned::from_value::<Map>(&v.inner).is_err(),
+            Err(_) => true,
+        }
+    };
+    let yaml_spanned_value_rejects = {
+        match yaml_spanned::from_str(DUP_YAML) {
+            Ok(v) => Map::deserialize(&v.inner).is_err(),
+            Err(_) => true,
+        }
+    };
+
     // Print a concise Markdown table (visible in test output with --nocapture).
     println!("| Crate           | Typed parse | Value -> Map |");
     println!("|----------------:|:------------|:-------------|");
@@ -76,6 +90,7 @@ pub fn duplicate_keys_across_crates() {
     println!("| serde_yaml_ng   | {} | {} |", mark(yaml_ng_direct_rejects), mark(yaml_ng_value_rejects));
     println!("| serde_yml       | {} | {} |", mark(yml_direct_rejects), mark(yml_value_rejects));
     println!("| serde_norway    | {} | {} |", mark(norway_direct_rejects), mark(norway_value_rejects));
+    println!("| yaml-spanned    | {} | {} |", mark(yaml_spanned_direct_rejects), mark(yaml_spanned_value_rejects));
 
     // Optional: If you want to force a failure when *none* reject duplicates, uncomment:
     // assert!(
