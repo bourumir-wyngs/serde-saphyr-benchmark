@@ -11,6 +11,7 @@ mod duplicate_keys;
 
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
+use yaml_spanned::Spanned;
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 struct Person {
@@ -247,7 +248,7 @@ fn main() {
         ),
     });
 
-    // yaml-spanned (two-step process: parse to Value, then deserialize)
+    // yaml_spanned (assumed Value + apply_merge available)
     let merge_yaml_spanned = if works_direct(
         || {
             let value = yaml_spanned::from_str(MERGE_KEYS_YAML).ok()?;
@@ -255,10 +256,20 @@ fn main() {
         },
         &expected_people,
     ) {
-        MergeSupport::Native
-    } else {
-        MergeSupport::No
-    };
+        MergeSupport::Native        } else {
+            let via = (|| {
+                let mut v = yaml_spanned::from_str(MERGE_KEYS_YAML).ok()?;
+                v.apply_merge().ok();
+                People::deserialize(v.inner).ok()
+            })()
+                .map(|x| x == expected_people)
+                .unwrap_or(false);
+            if via {
+                MergeSupport::ApplyMerge
+            } else {
+                MergeSupport::No
+            }
+        };
     rows.push(Row {
         name: "yaml-spanned",
         merge: merge_yaml_spanned,
