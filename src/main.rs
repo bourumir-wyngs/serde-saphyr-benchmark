@@ -11,13 +11,22 @@ mod duplicate_keys;
 
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
-use yaml_spanned::Spanned;
+use std::borrow::Cow;
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 struct Person {
     name: String,
     age: u32,
     city: String,
+}
+
+#[derive(Debug, Deserialize)]
+struct CowStruct<'a> {
+    /// This field should be `Cow::Borrowed` when the input allows it.
+    ///
+    /// Note: The lifetime `'a` is tied to the input string of `from_str`.
+    #[serde(borrow)]
+    s: Cow<'a, str>,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
@@ -89,6 +98,7 @@ struct Row {
     name: &'static str,
     merge: MergeSupport,
     nested_enums: bool,
+    cow_borrowed: Option<bool>,
 }
 
 fn main() {
@@ -113,10 +123,7 @@ fn main() {
     let mut rows: Vec<Row> = Vec::new();
 
     // Helper for pattern repetition (no impl Trait in closure return type)
-    fn works_direct<T>(
-        f: impl Fn() -> Option<T>,
-        expected: &T,
-    ) -> bool
+    fn works_direct<T>(f: impl Fn() -> Option<T>, expected: &T) -> bool
     where
         T: serde::de::DeserializeOwned + PartialEq + std::fmt::Debug,
     {
@@ -126,28 +133,44 @@ fn main() {
     // serde-saphyr
     rows.push(Row {
         name: "serde-saphyr",
-        merge: if works_direct(|| serde_saphyr::from_str(MERGE_KEYS_YAML).ok(), &expected_people) {
+        merge: if works_direct(
+            || serde_saphyr::from_str(MERGE_KEYS_YAML).ok(),
+            &expected_people,
+        ) {
             MergeSupport::Native
         } else {
             MergeSupport::No
         },
-        nested_enums: works_direct(|| serde_saphyr::from_str(NESTED_ENUMS_YAML).ok(), &expected_doc),
+        nested_enums: works_direct(
+            || serde_saphyr::from_str(NESTED_ENUMS_YAML).ok(),
+            &expected_doc,
+        ),
+        cow_borrowed: None,
     });
 
     // serde-yaml-bw
     rows.push(Row {
         name: "serde-yaml-bw",
-        merge: if works_direct(|| serde_yaml_bw::from_str(MERGE_KEYS_YAML).ok(), &expected_people) {
+        merge: if works_direct(
+            || serde_yaml_bw::from_str(MERGE_KEYS_YAML).ok(),
+            &expected_people,
+        ) {
             MergeSupport::Native
         } else {
             MergeSupport::No
         },
-        nested_enums: works_direct(|| serde_yaml_bw::from_str(NESTED_ENUMS_YAML).ok(), &expected_doc),
+        nested_enums: works_direct(
+            || serde_yaml_bw::from_str(NESTED_ENUMS_YAML).ok(),
+            &expected_doc,
+        ),
+        cow_borrowed: None,
     });
 
     // serde_yaml
-    let merge_yaml = if works_direct(|| serde_yaml::from_str(MERGE_KEYS_YAML).ok(), &expected_people)
-    {
+    let merge_yaml = if works_direct(
+        || serde_yaml::from_str(MERGE_KEYS_YAML).ok(),
+        &expected_people,
+    ) {
         MergeSupport::Native
     } else {
         // Value + apply_merge
@@ -167,27 +190,33 @@ fn main() {
     rows.push(Row {
         name: "serde_yaml",
         merge: merge_yaml,
-        nested_enums: works_direct(|| serde_yaml::from_str(NESTED_ENUMS_YAML).ok(), &expected_doc),
+        nested_enums: works_direct(
+            || serde_yaml::from_str(NESTED_ENUMS_YAML).ok(),
+            &expected_doc,
+        ),
+        cow_borrowed: None,
     });
 
     // serde_yaml_ng
-    let merge_yaml_ng =
-        if works_direct(|| serde_yaml_ng::from_str(MERGE_KEYS_YAML).ok(), &expected_people) {
-            MergeSupport::Native
+    let merge_yaml_ng = if works_direct(
+        || serde_yaml_ng::from_str(MERGE_KEYS_YAML).ok(),
+        &expected_people,
+    ) {
+        MergeSupport::Native
+    } else {
+        let via = (|| {
+            let mut v: serde_yaml_ng::Value = serde_yaml_ng::from_str(MERGE_KEYS_YAML).ok()?;
+            v.apply_merge().ok();
+            People::deserialize(v).ok()
+        })()
+            .map(|x| x == expected_people)
+            .unwrap_or(false);
+        if via {
+            MergeSupport::ApplyMerge
         } else {
-            let via = (|| {
-                let mut v: serde_yaml_ng::Value = serde_yaml_ng::from_str(MERGE_KEYS_YAML).ok()?;
-                v.apply_merge().ok();
-                People::deserialize(v).ok()
-            })()
-                .map(|x| x == expected_people)
-                .unwrap_or(false);
-            if via {
-                MergeSupport::ApplyMerge
-            } else {
-                MergeSupport::No
-            }
-        };
+            MergeSupport::No
+        }
+    };
     rows.push(Row {
         name: "serde_yaml_ng",
         merge: merge_yaml_ng,
@@ -195,50 +224,59 @@ fn main() {
             || serde_yaml_ng::from_str(NESTED_ENUMS_YAML).ok(),
             &expected_doc,
         ),
+        cow_borrowed: None,
     });
 
     // serde_yml (assumed Value + apply_merge available)
-    let merge_yml =
-        if works_direct(|| serde_yml::from_str(MERGE_KEYS_YAML).ok(), &expected_people) {
-            MergeSupport::Native
+    let merge_yml = if works_direct(
+        || serde_yml::from_str(MERGE_KEYS_YAML).ok(),
+        &expected_people,
+    ) {
+        MergeSupport::Native
+    } else {
+        let via = (|| {
+            let mut v: serde_yml::Value = serde_yml::from_str(MERGE_KEYS_YAML).ok()?;
+            v.apply_merge().ok();
+            People::deserialize(v).ok()
+        })()
+            .map(|x| x == expected_people)
+            .unwrap_or(false);
+        if via {
+            MergeSupport::ApplyMerge
         } else {
-            let via = (|| {
-                let mut v: serde_yml::Value = serde_yml::from_str(MERGE_KEYS_YAML).ok()?;
-                v.apply_merge().ok();
-                People::deserialize(v).ok()
-            })()
-                .map(|x| x == expected_people)
-                .unwrap_or(false);
-            if via {
-                MergeSupport::ApplyMerge
-            } else {
-                MergeSupport::No
-            }
-        };
+            MergeSupport::No
+        }
+    };
     rows.push(Row {
         name: "serde_yml",
         merge: merge_yml,
-        nested_enums: works_direct(|| serde_yml::from_str(NESTED_ENUMS_YAML).ok(), &expected_doc),
+        nested_enums: works_direct(
+            || serde_yml::from_str(NESTED_ENUMS_YAML).ok(),
+            &expected_doc,
+        ),
+        cow_borrowed: None,
     });
 
     // serde_norway (assumed Value + apply_merge available)
-    let merge_norway =
-        if works_direct(|| serde_norway::from_str(MERGE_KEYS_YAML).ok(), &expected_people) {
-            MergeSupport::Native
+    let merge_norway = if works_direct(
+        || serde_norway::from_str(MERGE_KEYS_YAML).ok(),
+        &expected_people,
+    ) {
+        MergeSupport::Native
+    } else {
+        let via = (|| {
+            let mut v: serde_norway::Value = serde_norway::from_str(MERGE_KEYS_YAML).ok()?;
+            v.apply_merge().ok();
+            People::deserialize(v).ok()
+        })()
+            .map(|x| x == expected_people)
+            .unwrap_or(false);
+        if via {
+            MergeSupport::ApplyMerge
         } else {
-            let via = (|| {
-                let mut v: serde_norway::Value = serde_norway::from_str(MERGE_KEYS_YAML).ok()?;
-                v.apply_merge().ok();
-                People::deserialize(v).ok()
-            })()
-                .map(|x| x == expected_people)
-                .unwrap_or(false);
-            if via {
-                MergeSupport::ApplyMerge
-            } else {
-                MergeSupport::No
-            }
-        };
+            MergeSupport::No
+        }
+    };
     rows.push(Row {
         name: "serde_norway",
         merge: merge_norway,
@@ -246,6 +284,7 @@ fn main() {
             || serde_norway::from_str(NESTED_ENUMS_YAML).ok(),
             &expected_doc,
         ),
+        cow_borrowed: None,
     });
 
     // yaml_spanned (assumed Value + apply_merge available)
@@ -256,20 +295,21 @@ fn main() {
         },
         &expected_people,
     ) {
-        MergeSupport::Native        } else {
-            let via = (|| {
-                let mut v = yaml_spanned::from_str(MERGE_KEYS_YAML).ok()?;
-                v.apply_merge().ok();
-                People::deserialize(v.inner).ok()
-            })()
-                .map(|x| x == expected_people)
-                .unwrap_or(false);
-            if via {
-                MergeSupport::ApplyMerge
-            } else {
-                MergeSupport::No
-            }
-        };
+        MergeSupport::Native
+    } else {
+        let via = (|| {
+            let mut v = yaml_spanned::from_str(MERGE_KEYS_YAML).ok()?;
+            v.apply_merge().ok();
+            People::deserialize(v.inner).ok()
+        })()
+            .map(|x| x == expected_people)
+            .unwrap_or(false);
+        if via {
+            MergeSupport::ApplyMerge
+        } else {
+            MergeSupport::No
+        }
+    };
     rows.push(Row {
         name: "yaml-spanned",
         merge: merge_yaml_spanned,
@@ -280,7 +320,31 @@ fn main() {
             },
             &expected_doc,
         ),
+        cow_borrowed: None,
     });
+
+    let input = "s: \"hello, cows\"\n";
+    let cow_serde_yaml =
+        cow_borrowed(serde_yaml::from_str(input).map_err(|e| anyhow::anyhow!("{:?}", e)));
+    let cow_serde_yaml_ng =
+        cow_borrowed(serde_yaml_ng::from_str(input).map_err(|e| anyhow::anyhow!("{:?}", e)));
+    let cow_serde_yml =
+        cow_borrowed(serde_yml::from_str(input).map_err(|e| anyhow::anyhow!("{:?}", e)));
+    let cow_serde_norway =
+        cow_borrowed(serde_norway::from_str(input).map_err(|e| anyhow::anyhow!("{:?}", e)));
+    // let cow_yaml_spanned = cow_borrowed(yaml_spanned::from_str(input);
+    let cow_saphyr = cow_borrowed(serde_saphyr::from_str(input).map_err(|e| anyhow::anyhow!("{:?}", e)));
+
+    for r in &mut rows {
+        r.cow_borrowed = match r.name {
+            "serde_yaml" => Some(cow_serde_yaml),
+            "serde_yaml_ng" => Some(cow_serde_yaml_ng),
+            "serde_yml" => Some(cow_serde_yml),
+            "serde_norway" => Some(cow_serde_norway),
+            "serde-saphyr" => Some(cow_saphyr),
+            _ => None,
+        };
+    }
 
     println!("Error");
     println!(
@@ -313,8 +377,8 @@ fn main() {
     );
 
     // Print Markdown table
-    println!("| Crate | Merge Keys | Nested Enums |");
-    println!("|------:|:-----------|:-----------------------------|");
+    println!("| Crate | Merge Keys | Nested Enums | Cow Borrowed |");
+    println!("|------:|:-----------|:------------:|:------------:|");
     for r in rows {
         let merge_str = match r.merge {
             MergeSupport::Native => "✅ Native",
@@ -322,10 +386,26 @@ fn main() {
             MergeSupport::No => "❌",
         };
         let nested_str = if r.nested_enums { "✅" } else { "❌" };
-        println!("| {} | {} | {} |", r.name, merge_str, nested_str);
+        let cow_str = match r.cow_borrowed {
+            Some(true) => "✅",
+            Some(false) => "❌",
+            None => "❌",
+        };
+        println!(
+            "| {} | {} | {} | {} |",
+            r.name, merge_str, nested_str, cow_str
+        );
     }
 
     duplicate_keys::duplicate_keys_across_crates();
 }
 
-
+fn cow_borrowed(cow: Result<CowStruct, anyhow::Error>) -> bool {
+    match cow {
+        Ok(cow) => match &cow.s {
+            Cow::Borrowed(_b) => true,
+            Cow::Owned(_s) => false,
+        },
+        _ => false,
+    }
+}

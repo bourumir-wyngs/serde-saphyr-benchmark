@@ -18,7 +18,11 @@ k: 2
 type Map = BTreeMap<String, i32>;
 
 fn mark(rejected: bool) -> &'static str {
-    if rejected { "✅ reject" } else { "❌ accepts" }
+    if rejected {
+        "✅ reject"
+    } else {
+        "❌ accepts"
+    }
 }
 
 pub fn duplicate_keys_across_crates() {
@@ -86,11 +90,31 @@ pub fn duplicate_keys_across_crates() {
     println!("|----------------:|:------------|:-------------|");
     println!("| serde-saphyr    | {} | {} |", mark(saphyr_rejects), "—");
     println!("| serde-yaml-bw   | {} | {} |", mark(yaml_bw_rejects), "—");
-    println!("| serde_yaml      | {} | {} |", mark(yaml_direct_rejects), mark(yaml_value_rejects));
-    println!("| serde_yaml_ng   | {} | {} |", mark(yaml_ng_direct_rejects), mark(yaml_ng_value_rejects));
-    println!("| serde_yml       | {} | {} |", mark(yml_direct_rejects), mark(yml_value_rejects));
-    println!("| serde_norway    | {} | {} |", mark(norway_direct_rejects), mark(norway_value_rejects));
-    println!("| yaml-spanned    | {} | {} |", mark(yaml_spanned_direct_rejects), mark(yaml_spanned_value_rejects));
+    println!(
+        "| serde_yaml      | {} | {} |",
+        mark(yaml_direct_rejects),
+        mark(yaml_value_rejects)
+    );
+    println!(
+        "| serde_yaml_ng   | {} | {} |",
+        mark(yaml_ng_direct_rejects),
+        mark(yaml_ng_value_rejects)
+    );
+    println!(
+        "| serde_yml       | {} | {} |",
+        mark(yml_direct_rejects),
+        mark(yml_value_rejects)
+    );
+    println!(
+        "| serde_norway    | {} | {} |",
+        mark(norway_direct_rejects),
+        mark(norway_value_rejects)
+    );
+    println!(
+        "| yaml-spanned    | {} | {} |",
+        mark(yaml_spanned_direct_rejects),
+        mark(yaml_spanned_value_rejects)
+    );
 
     // Optional: If you want to force a failure when *none* reject duplicates, uncomment:
     // assert!(
@@ -104,4 +128,3 @@ pub fn duplicate_keys_across_crates() {
 // Needed imports for Value -> Map conversions via Serde.
 use serde::Deserialize;
 use serde::{self};
-

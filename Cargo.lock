@@ -131,6 +131,7 @@ checksum = "72b3254f16251a8381aa12e40e3c4d2f0199f8c6508fbecb9d91f575e0fbb8c6"
 name = "benchmark"
 version = "0.1.0"
 dependencies = [
+ "anyhow",
  "criterion",
  "mimalloc",
  "serde",
@@ -1021,8 +1022,8 @@ dependencies = [
 
 [[package]]
 name = "saphyr-parser-bw"
-version = "0.0.605"
-source = "git+https://github.com/bourumir-wyngs/saphyr?branch=dev%2Fsaphyr-parser#aee7745984d9dd83136f863403acd800ba1dc986"
+version = "0.0.606"
+source = "git+https://github.com/bourumir-wyngs/saphyr?branch=dev%2Fsaphyr-parser#c95fb87ed0a3ab80321c4955a00fcb62a54304cf"
 dependencies = [
  "arraydeque",
  "smallvec 2.0.0-alpha.12",
@@ -1041,8 +1042,8 @@ dependencies = [
 
 [[package]]
 name = "serde-saphyr"
-version = "0.0.16"
-source = "git+https://github.com/bourumir-wyngs/serde-saphyr?branch=master#ac3e47ac37289ed53979191873c3d5bbecfa53ae"
+version = "0.0.17"
+source = "git+https://github.com/bourumir-wyngs/serde-saphyr?branch=master#6aa89c33ad6284f1a495ee40d378e46573ba5b6f"
 dependencies = [
  "ahash",
  "annotate-snippets",

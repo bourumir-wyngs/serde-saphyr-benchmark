@@ -61,12 +61,18 @@ fn build_large_json(target_size: usize, notes_per_item: usize) -> String {
     let mut index = 0usize;
     let mut first = true;
     while s.len() < target_size {
-        if !first { s.push(','); } else { first = false; }
+        if !first {
+            s.push(',');
+        } else {
+            first = false;
+        }
         // Build notes array for this item first
         let mut notes = String::with_capacity(notes_per_item * 64);
         notes.push('[');
         for note_index in 0..notes_per_item {
-            if note_index != 0 { notes.push(','); }
+            if note_index != 0 {
+                notes.push(',');
+            }
             notes.push_str(&format!(
                 "\"Note {:02} for item {:05}. This is repeated content to enlarge the JSON payload size considerably.\"",
                 note_index, index
@@ -76,7 +82,10 @@ fn build_large_json(target_size: usize, notes_per_item: usize) -> String {
 
         // Build one item as JSON
         s.push('{');
-        s.push_str(&format!("\"enabled\":true,\"roles\":[\"reader\",\"writer\"],\"id\":{},", index));
+        s.push_str(&format!(
+            "\"enabled\":true,\"roles\":[\"reader\",\"writer\"],\"id\":{},",
+            index
+        ));
         s.push_str(&format!("\"name\":\"item_{:05}\",", index));
         s.push_str("\"details\":{");
         s.push_str(&format!(
@@ -141,7 +150,10 @@ fn parse_serde_yml(json: &str) -> Document {
 #[allow(dead_code)]
 fn parse_saphyr_budget_none(json: &str) -> Document {
     use serde_saphyr::{Error, Options};
-    let opts = Options { budget: None, ..Options::default() };
+    let opts = Options {
+        budget: None,
+        ..Options::default()
+    };
     let doc: Result<Document, Error> = serde_saphyr::from_str_with_options(black_box(json), opts);
     let doc = doc.expect("serde_saphyr (budget=None) parse failed");
     black_box(doc)
@@ -178,7 +190,8 @@ fn parse_yaml_spanned(json: &str) -> Document {
     use yaml_spanned;
     // yaml-spanned uses a two-step process: parse to Value, then deserialize
     let value = yaml_spanned::from_str(black_box(json)).expect("yaml_spanned parse failed");
-    let doc: Document = yaml_spanned::from_value(&value.inner).expect("yaml_spanned deserialize failed");
+    let doc: Document =
+        yaml_spanned::from_value(&value.inner).expect("yaml_spanned deserialize failed");
     black_box(doc)
 }
 
@@ -204,56 +217,101 @@ fn bench_compare_json(c: &mut Criterion) {
         group.bench_with_input(
             BenchmarkId::new("serde_json", format!("{}MiB", mib)),
             &json,
-            |b, j| b.iter(|| { let doc = parse_serde_json(j); black_box(doc.items.len()); }),
+            |b, j| {
+                b.iter(|| {
+                    let doc = parse_serde_json(j);
+                    black_box(doc.items.len());
+                })
+            },
         );
 
         // YAML-family parsers parsing JSON (YAML 1.2 is a superset of JSON)
         group.bench_with_input(
             BenchmarkId::new("serde_yaml", format!("{}MiB", mib)),
             &json,
-            |b, j| b.iter(|| { let doc = parse_serde_yaml(j); black_box(doc.items.len()); }),
+            |b, j| {
+                b.iter(|| {
+                    let doc = parse_serde_yaml(j);
+                    black_box(doc.items.len());
+                })
+            },
         );
 
         group.bench_with_input(
             BenchmarkId::new("serde_yaml_ng", format!("{}MiB", mib)),
             &json,
-            |b, j| b.iter(|| { let doc = parse_serde_yaml_ng(j); black_box(doc.items.len()); }),
+            |b, j| {
+                b.iter(|| {
+                    let doc = parse_serde_yaml_ng(j);
+                    black_box(doc.items.len());
+                })
+            },
         );
 
         group.bench_with_input(
             BenchmarkId::new("serde_yaml_bw", format!("{}MiB", mib)),
             &json,
-            |b, j| b.iter(|| { let doc = parse_serde_yaml_bw(j); black_box(doc.items.len()); }),
+            |b, j| {
+                b.iter(|| {
+                    let doc = parse_serde_yaml_bw(j);
+                    black_box(doc.items.len());
+                })
+            },
         );
 
         group.bench_with_input(
             BenchmarkId::new("serde_yaml_norway", format!("{}MiB", mib)),
             &json,
-            |b, j| b.iter(|| { let doc = parse_serde_yaml_norway(j); black_box(doc.items.len()); }),
+            |b, j| {
+                b.iter(|| {
+                    let doc = parse_serde_yaml_norway(j);
+                    black_box(doc.items.len());
+                })
+            },
         );
 
         group.bench_with_input(
             BenchmarkId::new("serde_yml", format!("{}MiB", mib)),
             &json,
-            |b, j| b.iter(|| { let doc = parse_serde_yml(j); black_box(doc.items.len()); }),
+            |b, j| {
+                b.iter(|| {
+                    let doc = parse_serde_yml(j);
+                    black_box(doc.items.len());
+                })
+            },
         );
 
         group.bench_with_input(
             BenchmarkId::new("serde_saphyr/budget_none", format!("{}MiB", mib)),
             &json,
-            |b, j| b.iter(|| { let doc = parse_saphyr_budget_none(j); black_box(doc.items.len()); }),
+            |b, j| {
+                b.iter(|| {
+                    let doc = parse_saphyr_budget_none(j);
+                    black_box(doc.items.len());
+                })
+            },
         );
 
         group.bench_with_input(
             BenchmarkId::new("serde_saphyr/budget_max", format!("{}MiB", mib)),
             &json,
-            |b, j| b.iter(|| { let doc = parse_saphyr_budget_max(j); black_box(doc.items.len()); }),
+            |b, j| {
+                b.iter(|| {
+                    let doc = parse_saphyr_budget_max(j);
+                    black_box(doc.items.len());
+                })
+            },
         );
 
         group.bench_with_input(
             BenchmarkId::new("yaml_spanned", format!("{}MiB", mib)),
             &json,
-            |b, j| b.iter(|| { let doc = parse_yaml_spanned(j); black_box(doc.items.len()); }),
+            |b, j| {
+                b.iter(|| {
+                    let doc = parse_yaml_spanned(j);
+                    black_box(doc.items.len());
+                })
+            },
         );
     }
 

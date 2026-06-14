@@ -112,7 +112,6 @@ fn parse_serde_yaml_ng(yaml: &str) -> Document {
     black_box(doc)
 }
 
-
 #[allow(dead_code)]
 fn parse_serde_yaml_bw(yaml: &str) -> Document {
     // Fork: serde-yaml-bw (assumed crate name serde_yaml_bw)
@@ -141,7 +140,10 @@ fn parse_serde_yml(yaml: &str) -> Document {
 fn parse_saphyr_budget_none(yaml: &str) -> Document {
     use serde_saphyr::{Error, Options};
     // Budget off: pure parser cost without guard bookkeeping (faster, but YAML must be own and controlled)
-    let opts = Options { budget: None, ..Options::default() };
+    let opts = Options {
+        budget: None,
+        ..Options::default()
+    };
     let doc: Result<Document, Error> = serde_saphyr::from_str_with_options(black_box(yaml), opts);
     let doc = doc.expect("serde_saphyr (budget=None) parse failed");
     black_box(doc)
@@ -181,7 +183,8 @@ fn parse_yaml_spanned(yaml: &str) -> Document {
     use yaml_spanned;
     // yaml-spanned uses a two-step process: parse to Value, then deserialize
     let value = yaml_spanned::from_str(black_box(yaml)).expect("yaml_spanned parse failed");
-    let doc: Document = yaml_spanned::from_value(&value.inner).expect("yaml_spanned deserialize failed");
+    let doc: Document =
+        yaml_spanned::from_value(&value.inner).expect("yaml_spanned deserialize failed");
     black_box(doc)
 }
 
@@ -213,14 +216,24 @@ fn bench_compare_yaml(c: &mut Criterion) {
         group.bench_with_input(
             BenchmarkId::new("serde_yaml", format!("{}MiB", mib)),
             &yaml,
-            |b, y| b.iter(|| { let doc = parse_serde_yaml(y); black_box(doc.items.len()); }),
+            |b, y| {
+                b.iter(|| {
+                    let doc = parse_serde_yaml(y);
+                    black_box(doc.items.len());
+                })
+            },
         );
 
         // ---- serde_yaml (baseline) ----
         group.bench_with_input(
             BenchmarkId::new("serde_yaml_ng", format!("{}MiB", mib)),
             &yaml,
-            |b, y| b.iter(|| { let doc = parse_serde_yaml_ng(y); black_box(doc.items.len()); }),
+            |b, y| {
+                b.iter(|| {
+                    let doc = parse_serde_yaml_ng(y);
+                    black_box(doc.items.len());
+                })
+            },
         );
 
         // ---- serde_yaml_bw (if you use it) ----
@@ -228,42 +241,72 @@ fn bench_compare_yaml(c: &mut Criterion) {
         group.bench_with_input(
             BenchmarkId::new("serde_yaml_bw", format!("{}MiB", mib)),
             &yaml,
-            |b, y| b.iter(|| { let doc = parse_serde_yaml_bw(y); black_box(doc.items.len()); }),
+            |b, y| {
+                b.iter(|| {
+                    let doc = parse_serde_yaml_bw(y);
+                    black_box(doc.items.len());
+                })
+            },
         );
 
         // ---- serde_yaml_norway (if you use it) ----
         group.bench_with_input(
             BenchmarkId::new("serde_yaml_norway", format!("{}MiB", mib)),
             &yaml,
-            |b, y| b.iter(|| { let doc = parse_serde_yaml_norway(y); black_box(doc.items.len()); }),
+            |b, y| {
+                b.iter(|| {
+                    let doc = parse_serde_yaml_norway(y);
+                    black_box(doc.items.len());
+                })
+            },
         );
 
         // ---- serde_yml ----
         group.bench_with_input(
             BenchmarkId::new("serde_yml", format!("{}MiB", mib)),
             &yaml,
-            |b, y| b.iter(|| { let doc = parse_serde_yml(y); black_box(doc.items.len()); }),
+            |b, y| {
+                b.iter(|| {
+                    let doc = parse_serde_yml(y);
+                    black_box(doc.items.len());
+                })
+            },
         );
 
         // ---- serde_saphyr (budget=None) ----
         group.bench_with_input(
             BenchmarkId::new("serde_saphyr/budget_none", format!("{}MiB", mib)),
             &yaml,
-            |b, y| b.iter(|| { let doc = parse_saphyr_budget_none(y); black_box(doc.items.len()); }),
+            |b, y| {
+                b.iter(|| {
+                    let doc = parse_saphyr_budget_none(y);
+                    black_box(doc.items.len());
+                })
+            },
         );
 
         // ---- serde_saphyr (budget=max) ----
         group.bench_with_input(
             BenchmarkId::new("serde_saphyr/budget_max", format!("{}MiB", mib)),
             &yaml,
-            |b, y| b.iter(|| { let doc = parse_saphyr_budget_max(y); black_box(doc.items.len()); }),
+            |b, y| {
+                b.iter(|| {
+                    let doc = parse_saphyr_budget_max(y);
+                    black_box(doc.items.len());
+                })
+            },
         );
 
         // ---- yaml-spanned ----
         group.bench_with_input(
             BenchmarkId::new("yaml_spanned", format!("{}MiB", mib)),
             &yaml,
-            |b, y| b.iter(|| { let doc = parse_yaml_spanned(y); black_box(doc.items.len()); }),
+            |b, y| {
+                b.iter(|| {
+                    let doc = parse_yaml_spanned(y);
+                    black_box(doc.items.len());
+                })
+            },
         );
     }
 
