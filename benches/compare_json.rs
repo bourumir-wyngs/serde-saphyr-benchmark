@@ -149,10 +149,9 @@ fn parse_serde_yml(json: &str) -> Document {
 
 #[allow(dead_code)]
 fn parse_saphyr_budget_none(json: &str) -> Document {
-    use serde_saphyr::{Error, Options};
-    let opts = Options {
+    use serde_saphyr::Error;
+    let opts = serde_saphyr::options! {
         budget: None,
-        ..Options::default()
     };
     let doc: Result<Document, Error> = serde_saphyr::from_str_with_options(black_box(json), opts);
     let doc = doc.expect("serde_saphyr (budget=None) parse failed");
@@ -161,10 +160,11 @@ fn parse_saphyr_budget_none(json: &str) -> Document {
 
 #[allow(dead_code)]
 fn parse_saphyr_budget_max(json: &str) -> Document {
-    use serde_saphyr::{budget::Budget, Error, Options};
+    use serde_saphyr::Error;
+
     let many: usize = usize::MAX / 4;
-    let opts = Options {
-        budget: Some(Budget {
+    let opts = serde_saphyr::options! {
+        budget: serde_saphyr::budget! {
             max_reader_input_bytes: Some(many),
             max_events: many,
             max_aliases: many,
@@ -174,11 +174,12 @@ fn parse_saphyr_budget_max(json: &str) -> Document {
             max_nodes: many,
             max_total_scalar_bytes: many,
             max_merge_keys: many,
+            max_inclusion_depth: u32::MAX,
+            max_total_comment_bytes: many,
             enforce_alias_anchor_ratio: false,
             alias_anchor_min_aliases: many,
             alias_anchor_ratio_multiplier: many,
-        }),
-        ..Options::default()
+        },
     };
     let doc: Result<Document, Error> = serde_saphyr::from_str_with_options(black_box(json), opts);
     let doc = doc.expect("serde_saphyr (budget=max) parse failed");
@@ -192,6 +193,12 @@ fn parse_yaml_spanned(json: &str) -> Document {
     let value = yaml_spanned::from_str(black_box(json)).expect("yaml_spanned parse failed");
     let doc: Document =
         yaml_spanned::from_value(&value.inner).expect("yaml_spanned deserialize failed");
+    black_box(doc)
+}
+
+#[allow(dead_code)]
+fn parse_noyalib(json: &str) -> Document {
+    let doc: Document = noyalib::from_str(black_box(json)).expect("noyalib parse failed");
     black_box(doc)
 }
 
@@ -309,6 +316,17 @@ fn bench_compare_json(c: &mut Criterion) {
             |b, j| {
                 b.iter(|| {
                     let doc = parse_yaml_spanned(j);
+                    black_box(doc.items.len());
+                })
+            },
+        );
+
+        group.bench_with_input(
+            BenchmarkId::new("noyalib", format!("{}MiB", mib)),
+            &json,
+            |b, j| {
+                b.iter(|| {
+                    let doc = parse_noyalib(j);
                     black_box(doc.items.len());
                 })
             },

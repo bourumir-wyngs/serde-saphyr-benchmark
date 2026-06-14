@@ -6,6 +6,7 @@
 //! - serde_yaml_norway (serde-yaml-norway fork)
 //! - serde_yml
 //! - serde_saphyr (two regimes): budget=None, and budget=very large ("max")
+//! - noyalib
 //!
 //! We generate one big YAML per target size and reuse it across all parsers,
 //! timing only the parse step. Throughput is reported via Criterion's
@@ -138,11 +139,10 @@ fn parse_serde_yml(yaml: &str) -> Document {
 
 #[allow(dead_code)]
 fn parse_saphyr_budget_none(yaml: &str) -> Document {
-    use serde_saphyr::{Error, Options};
+    use serde_saphyr::Error;
     // Budget off: pure parser cost without guard bookkeeping (faster, but YAML must be own and controlled)
-    let opts = Options {
+    let opts = serde_saphyr::options! {
         budget: None,
-        ..Options::default()
     };
     let doc: Result<Document, Error> = serde_saphyr::from_str_with_options(black_box(yaml), opts);
     let doc = doc.expect("serde_saphyr (budget=None) parse failed");
@@ -151,13 +151,13 @@ fn parse_saphyr_budget_none(yaml: &str) -> Document {
 
 #[allow(dead_code)]
 fn parse_saphyr_budget_max(yaml: &str) -> Document {
-    use serde_saphyr::{budget::Budget, Error, Options};
+    use serde_saphyr::Error;
 
     // Default budget would trigger DOS protection. This has no much impact on actual
     // performance because we only define threshold values we compare against.
     let many: usize = usize::MAX / 4;
-    let opts = Options {
-        budget: Some(Budget {
+    let opts = serde_saphyr::options! {
+        budget: serde_saphyr::budget! {
             max_reader_input_bytes: Some(many),
             max_events: many,
             max_aliases: many,
@@ -167,11 +167,12 @@ fn parse_saphyr_budget_max(yaml: &str) -> Document {
             max_nodes: many,
             max_total_scalar_bytes: many,
             max_merge_keys: many,
+            max_inclusion_depth: u32::MAX,
+            max_total_comment_bytes: many,
             enforce_alias_anchor_ratio: false,
             alias_anchor_min_aliases: many,
             alias_anchor_ratio_multiplier: many,
-        }),
-        ..Options::default()
+        },
     };
     let doc: Result<Document, Error> = serde_saphyr::from_str_with_options(black_box(yaml), opts);
     let doc = doc.expect("serde_saphyr (budget=max) parse failed");
@@ -185,6 +186,12 @@ fn parse_yaml_spanned(yaml: &str) -> Document {
     let value = yaml_spanned::from_str(black_box(yaml)).expect("yaml_spanned parse failed");
     let doc: Document =
         yaml_spanned::from_value(&value.inner).expect("yaml_spanned deserialize failed");
+    black_box(doc)
+}
+
+#[allow(dead_code)]
+fn parse_noyalib(yaml: &str) -> Document {
+    let doc: Document = noyalib::from_str(black_box(yaml)).expect("noyalib parse failed");
     black_box(doc)
 }
 
@@ -304,6 +311,18 @@ fn bench_compare_yaml(c: &mut Criterion) {
             |b, y| {
                 b.iter(|| {
                     let doc = parse_yaml_spanned(y);
+                    black_box(doc.items.len());
+                })
+            },
+        );
+
+        // ---- noyalib ----
+        group.bench_with_input(
+            BenchmarkId::new("noyalib", format!("{}MiB", mib)),
+            &yaml,
+            |b, y| {
+                b.iter(|| {
+                    let doc = parse_noyalib(y);
                     black_box(doc.items.len());
                 })
             },
