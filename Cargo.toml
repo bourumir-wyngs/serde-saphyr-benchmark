@@ -13,7 +13,7 @@ serde_yaml = "0.9.34+deprecated"
 serde_yaml_ng = "0.10.0"
 serde-yaml-bw = { package = "serde_yaml_bw", version = "2.4.1", optional = false }
 serde-norway = { package = "serde_norway", version = "0.9.42", optional = false }
-serde-yml = { package = "serde_yml", version = "0.0.12", optional = false }
+serde-yml = { package = "serde_yml", version = "0.0.12", optional = false } # orignal code and not 0.0.13 shim
 serde-saphyr = { git = "https://github.com/bourumir-wyngs/serde-saphyr", branch = "master" }
 yaml-spanned = "0.0.3"
 noyalib = "0.0.7"
